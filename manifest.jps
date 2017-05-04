@@ -1,0 +1,96 @@
+{
+    "jpsType": "install",
+    "jpsVersion": "0.99",
+    "id": "couchbase-cluster",
+    "baseUrl": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master",
+    "logo": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png",
+    "description": "Pre-configured and ready-to-work auto scalable Couchbase cluster. <br/>By default Data RAM = 1024MiB, Index RAM = 256MiB, FTS RAM = 256MiB.",
+    "name": "Couchbase Cluster",
+    "settings": {
+        "fields": [{
+            "type": "spinner",
+            "name": "nodes",
+            "caption": "Nodes in Cluster",
+            "min": 1,
+            "max": 10,
+            "default": 3
+        }]
+    },
+    "nodes": [{
+        "image": "couchbase",
+        "cloudlets": 16,
+        "nodeGroup": "cp",
+        "count": "${settings.nodes}"
+    }],
+    "ssl": true,
+    "globals": {
+        "user": "admin",
+        "pswd": "${fn.password}",
+        "data-ram": 1024,
+        "index-ram": 256,
+        "fts-ram": 256
+    },
+    "onInstall": [{
+            "cmd[${nodes.cp.first.id}]": [
+                "couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=${globals.user} --cluster-password=${globals.pswd} --cluster-ramsize=${globals.data-ram} --cluster-index-ramsize=${globals.index-ram} --cluster-fts-ramsize=${globals.fts-ram} --index-storage-setting=memopt --services=data,index,query,fts",
+                "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules"
+            ]
+        }, {
+            "forEach(env.nodes)": {
+                "if (${@i.id} != ${nodes.cp.first.id})": {
+                    "add-node": {
+                        "id": "${@i.id}",
+                        "address": "${@i.address}"
+                    }
+                }
+            }
+        },
+        "rebalance",
+        "autoscaling"
+    ],
+    "onAfterScaleOut[cp]": [{
+            "forEach(event.response.nodes)": {
+                "add-node": {
+                    "id": "${@i.id}",
+                    "address": "${@i.address}"
+                }
+            }
+        },
+        "rebalance"
+    ],
+    "onBeforeScaleIn[cp]": [{
+            "forEach(event.response.nodes)": {
+                "remove-node": {
+                    "address": "${@i.address}"
+                }
+            }
+        },
+        "rebalance"
+    ],
+    "actions": {
+        "add-node": {
+            "cmd[${this.id}]": [
+                "couchbase-cli server-add -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=${globals.pswd} --services=data,index,query,fts",
+                "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules"
+            ]
+        },
+        "remove-node": {
+            "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-remove=${this.address}"
+        },
+        "rebalance": {
+            "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd}"
+        },
+        "autoscaling": {
+            "script": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js",
+            "params": {
+                "nodeGroup": "cp",
+                "upLimit": "10",
+                "downLimit": "${settings.nodes}"
+            }
+        }
+    },
+    "success": {
+        "text": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/text/success.md",
+        "email": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/text/success.md"
+    }
+}
