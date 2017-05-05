@@ -2,7 +2,6 @@
     "jpsType": "install",
     "jpsVersion": "0.99",
     "id": "couchbase-cluster",
-    "baseUrl": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master",
     "logo": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png",
     "description": "Pre-configured and ready-to-work auto scalable Couchbase cluster. <br/>By default Data RAM = 1024MiB, Index RAM = 256MiB, FTS RAM = 256MiB.",
     "name": "Couchbase Cluster",
@@ -90,7 +89,7 @@
         }
     },
     "success": {
-        "text": "https://github.com/jelastic-jps/couchbase/raw/master/text/success.md",
-        "email": "https://github.com/jelastic-jps/couchbase/raw/master/text/success.md"
+        "text": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/text/success.md",
+        "email": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/text/success.md"
     }
 }
