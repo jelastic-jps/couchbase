@@ -3,8 +3,11 @@
     "jpsVersion": "0.99",
     "id": "couchbase-cluster",
     "logo": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png",
-    "description": "Pre-configured and ready-to-work auto scalable Couchbase cluster. <br/>By default Data RAM = 1024MiB, Index RAM = 256MiB, FTS RAM = 256MiB.",
-    "name": "Couchbase Cluster",
+    "description": {
+       "text": "<span>Out-of-box Couchbase Cluster with preconfigured auto scaling and load rebalancing upon node count change.</span><div>The default Data RAM sizing for each server equals 1024 MiB, with Index RAM = 256 MiB and Full Text Search (FTS) RAM = 256 MiB.</div>",
+        "short": "Out-of-box Couchbase Cluster with preconfigured auto scaling and load balancing"
+},
+    "name": "Auto Scalable Couchbase Cluster",
     "settings": {
         "fields": [{
             "type": "spinner",
