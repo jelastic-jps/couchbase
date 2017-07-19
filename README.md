@@ -14,11 +14,11 @@ installation stage).
 
 ![couchbase-server-cluster](images/couchbase-server-cluster.png)
 
-Upon creation, each Couchbase container is assigned *16 dynamic* cloudlets as a room of resources for [vertical scaling](https://docs.jelastic.com/automatic-vertical-scaling) (up to 2
+Upon creation, each Couchbase container is assigned *16 dynamic cloudlets* as a room of resources for [vertical scaling](https://docs.jelastic.com/automatic-vertical-scaling) (up to 2
 GiB of RAM and 6.4 GHz of CPU). Subsequently, this default limit could be adjusted through the environment topology wizard by
 following the linked guide.
 
-Also, the following values are set as a maximal memory allocation size for the corresponding RAM services at each node in the\
+Also, the following values are set as a maximal memory allocation size for the corresponding RAM services at each node in the
 cluster:
 - *Data* RAM - 1024 MiB
 - *Index* RAM - 256 MiB
@@ -44,7 +44,7 @@ Scaling](https://docs.jelastic.com/automatic-horizontal-scaling) guide.
 ## How to Install Auto-Scalable Couchbase Cluster
 
 In order to get Couchbase Cluster automatically set up, click the **Deploy to Jelastic** button below and specify your email
-address within the opened widget. Then, choose one of the Jelastic [Public Cloud providers](https://jelastic.cloud/) (in case
+address within the opened widget. Then, choose one of the [Jelastic Public Cloud](https://jelastic.cloud/) providers (in case
 you don’t have an account at the chosen platform, it will be created automatically) and click **Install**.
 
 [![Deploy](images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/couchbase/master/manifest.jps)
