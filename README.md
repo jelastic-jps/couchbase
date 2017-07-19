@@ -54,7 +54,7 @@ Otherwise, i.e. to deploy the package manually, log in to Jelastic dashboard wit
 ![deploy-couchbase-cluster](images/deploy-couchbase-cluster.png)
 
 Within the installation window, set a number of *Nodes in Cluster* to be created, type *Environment* name, and optional
-*Display Name* ([environment alias](https://docs.jelastic.com/environment-aliases)). Also, select the preferable [region](https://docs.jelastic.com/environment-regions) (if several ones are available) and click *Install*.
+*Display Name* ([environment alias](https://docs.jelastic.com/environment-aliases)). Also, select the preferable [region](https://docs.jelastic.com/environment-regions) (if several ones are available) and click **Install**.
 
 Wait a few minutes for Jelastic to prepare your environment and configure the auto-scaling settings. Once cluster is up,
 you’ll be shown the appropriate pop-up message.
