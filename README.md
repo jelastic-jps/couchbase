@@ -63,3 +63,5 @@ you’ll be shown the appropriate pop-up message.
 
 Click **Open in browser** here to access the *Couchbase Web Console* with your credentials and start exploring the available
 features and filling up your DB with the data. 
+
+For more information on the Couchbase Cluster performance, refer to the following [article](http://blog.jelastic.com/2017/07/20/auto-scalable-couchbase-cluster-in-docker-containers/).
