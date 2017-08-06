@@ -16,13 +16,13 @@
         "fts-ram": 256
     },
     "onInstall": [{
-            "cmd[${nodes.cp.first.id}]": [
+            "cmd[${nodes.nosqldb.first.id}]": [
                 "couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=${globals.user} --cluster-password=${globals.pswd} --cluster-ramsize=${globals.data-ram} --cluster-index-ramsize=${globals.index-ram} --cluster-fts-ramsize=${globals.fts-ram} --index-storage-setting=memopt --services=data,index,query,fts",
                 "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules"
             ]
         }, {
             "forEach(env.nodes)": {
-                "if (${@i.id} != ${nodes.cp.first.id})": {
+                "if (${@i.id} != ${nodes.nosqldb.first.id})": {
                     "add-node": {
                         "id": "${@i.id}",
                         "address": "${@i.address}"
@@ -33,7 +33,7 @@
         "rebalance",
         "autoscaling"
     ],
-    "onAfterScaleOut[cp]": [{
+    "onAfterScaleOut[nosqldb]": [{
             "forEach(event.response.nodes)": {
                 "add-node": {
                     "id": "${@i.id}",
@@ -43,7 +43,7 @@
         },
         "rebalance"
     ],
-    "onBeforeScaleIn[cp]": [{
+    "onBeforeScaleIn[nosqldb]": [{
             "forEach(event.response.nodes)": {
                 "remove-node": {
                     "address": "${@i.address}"
@@ -55,22 +55,22 @@
     "actions": {
         "add-node": {
             "cmd[${this.id}]": [
-                "couchbase-cli server-add -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=${globals.pswd} --services=data,index,query,fts",
+                "couchbase-cli server-add -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=${globals.pswd} --services=data,index,query,fts",
                 "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules"
             ]
         },
         "remove-node": {
-            "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-remove=${this.address}"
+            "cmd[${nodes.nosqldb.first.id}]": "couchbase-cli rebalance -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-remove=${this.address}"
         },
         "rebalance": {
-            "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd}"
+            "cmd[${nodes.nosqldb.first.id}]": "couchbase-cli rebalance -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p ${globals.pswd}"
         },
         "autoscaling": {
             "script": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js",
             "params": {
-                "nodeGroup": "cp",
+                "nodeGroup": "nosqldb",
                 "upLimit": "10",
-                "downLimit": "${nodes.cp.length}"
+                "downLimit": "${nodes.nosqldb.length}"
             }
         }
     },
