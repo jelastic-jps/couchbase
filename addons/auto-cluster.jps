@@ -70,7 +70,7 @@
             "params": {
                 "nodeGroup": "cp",
                 "upLimit": "10",
-                "downLimit": "${settings.nodes}"
+                "downLimit": "${nodes.cp.length}"
             }
         }
     },
