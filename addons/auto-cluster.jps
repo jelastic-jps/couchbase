@@ -75,7 +75,6 @@
         }
     },
     "success": {
-        "text": "Use the data below for admin access:<br/>Web Console: <a href='${env.protocol}://${env.domain}/ui/index.html' target='_blank'>${env.protocol}://${env.domain}</a><br/>User: ${globals.user}<br/>Password: ${globals.pswd}",
-        "email": "Use the data below for admin access:<br/>Web Console: <a href='${env.protocol}://${env.domain}/ui/index.html' target='_blank'>${env.protocol}://${env.domain}</a><br/>User: ${globals.user}<br/>Password: ${globals.pswd}"
+        "email": "Use the data below for admin access:<br/>Web Console: <a href='${nodes.nosqldb.first.url}/ui/index.html' target='_blank'>${nodes.nosqldb.first.url}</a><br/>User: ${globals.user}<br/>Password: ${globals.pswd}"
     }
 }
