@@ -1,0 +1,87 @@
+{
+  "jpsType": "update",
+  "jpsVersion": "0.99",
+  "id": "couchbase-auto-cluster",
+  "name": "Auto Scalable Couchbase Cluster",
+  "globals": {
+    "user": "admin"
+  },
+  "onInstall": [
+    {
+      "cmd": {
+        "nodeId": "${nodes.nosqldb.first.id}",
+        "user": "root",
+        "commands": [
+          "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules; service couchbase start &>/dev/null; sleep 5; couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=${globals.user} --cluster-password=$(cat /root/couch_pass) --cluster-ramsize=512 --cluster-index-ramsize=256 --cluster-fts-ramsize=256 --services=data,index,query,fts"
+        ]
+      }
+    },
+    {
+      "forEach(env.nodes)": {
+        "if (${@i.id} != ${nodes.nosqldb.first.id})": {
+          "add-node": {
+            "id": "${@i.id}",
+            "address": "${@i.address}"
+          }
+        }
+      }
+    },
+    "rebalance",
+    "autoscaling"
+  ],
+  "onAfterScaleOut[nosqldb]": [
+    {
+      "forEach(event.response.nodes)": {
+        "add-node": {
+          "id": "${@i.id}",
+          "address": "${@i.address}"
+        }
+      }
+    },
+    "rebalance"
+  ],
+  "onBeforeScaleIn[nosqldb]": [
+    {
+      "forEach(event.response.nodes)": {
+        "remove-node": {
+          "address": "${@i.address}"
+        }
+      }
+    },
+    "rebalance"
+  ],
+  "actions": {
+    "add-node": {
+      "cmd[${nodes.nosqldb.first.id}]": {
+        "user": "root",
+        "commands": [
+          "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules; service couchbase start &>/dev/null; sleep 5; couchbase-cli server-add -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p $(cat /root/couch_pass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(cat /root/couch_pass) --services=data,index,query,fts"
+        ]
+      }
+    },
+    "remove-node": {
+      "cmd[${nodes.nosqldb.first.id}]": {
+        "user": "root",
+        "commands": [
+          "couchbase-cli rebalance -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p $(cat /root/couch_pass) --server-remove=${this.address}"
+        ]
+      }
+    },
+    "rebalance": {
+      "cmd[${nodes.nosqldb.first.id}]": {
+        "user": "root",
+        "commands": [
+          "couchbase-cli rebalance -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p $(cat /root/couch_pass)"
+        ]
+      }
+    },
+    "autoscaling": {
+      "script": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js",
+      "params": {
+        "nodeGroup": "nosqldb",
+        "upLimit": "10",
+        "downLimit": "${nodes.nosqldb.length}"
+      }
+    }
+  }
+}
