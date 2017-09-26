@@ -52,14 +52,16 @@
   ],
   "actions": {
     "add-node": {
-      "cmd[${this.id}]": [
-        "service couchbase start &>/dev/null;",
-        "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules;"
-      ]
+      "cmd[${this.id}]": {
+        "user": "root",
+        "commands": [
+          "service couchbase start &>/dev/null; iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules;"
+        ]
+      },
       "cmd[${nodes.nosqldb.first.id}]": {
         "user": "root",
         "commands": [
-          "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules; service couchbase start &>/dev/null; sleep 5; couchbase-cli server-add -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p $(cat /root/couch_pass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(cat /root/couch_pass) --services=data,index,query,fts"
+          "service couchbase start &>/dev/null; couchbase-cli server-add -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p $(cat /root/couch_pass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(cat /root/couch_pass) --services=data,index,query,fts;"
         ]
       }
     },
