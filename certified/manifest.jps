@@ -46,7 +46,7 @@
     {
       "forEach(event.response.nodes)": {
         "if (${@i.id} != ${nodes.nosqldb.first.id})": {
-          "add-node": {
+          "remove-node": {
             "id": "${@i.id}",
             "address": "${@i.address}"
           }
