@@ -83,7 +83,8 @@
             "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-remove=${this.address}"
         },
         "rebalance": {
-            "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd}"
+            "cmd[${nodes.cp.first.id}]": "couchbase-cli rebalance -c ${nodes.cp.first.address}:8091 -u ${globals.user} -p ${globals.pswd}",
+            "user": "root"
         },
         "autoscaling": {
             "script": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js",
