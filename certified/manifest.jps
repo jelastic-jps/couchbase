@@ -12,8 +12,7 @@
         "nodeId": "${nodes.nosqldb.first.id}",
         "user": "root",
         "commands": [
-          "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules",
-          "couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=${globals.user} --cluster-password=$(cat /root/couch_pass) --cluster-ramsize=512 --cluster-index-ramsize=256 --cluster-fts-ramsize=256 --services=data,index,query,fts"
+          "total_mem=$(free -m|grep Mem|awk '{print $2}'); cache_size=$(echo $total_mem / 4 | bc); couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=${globals.user} --cluster-password=$(cat /root/couch_pass) --cluster-ramsize=${cache_size} --cluster-index-ramsize=${cache_size} --cluster-fts-ramsize=${cache_size} --services=data,index,query,fts"
         ]
       }
     },
@@ -23,6 +22,9 @@
           "add-node": {
             "id": "${@i.id}",
             "address": "${@i.address}"
+          },
+          "set-node-password": {
+            "id": "${@i.id}"
           }
         }
       }
@@ -36,6 +38,9 @@
           "add-node": {
             "id": "${@i.id}",
             "address": "${@i.address}"
+          },
+          "set-node-password": {
+            "id": "${@i.id}"
           }
         }
       }
@@ -60,7 +65,7 @@
       "cmd[${this.id}]": {
         "user": "root",
         "commands": [
-          "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules;"
+          "service couchbase start"
         ]
       },
       "cmd[${nodes.nosqldb.first.id}]": {
@@ -75,6 +80,14 @@
         "user": "root",
         "commands": [
           "couchbase-cli rebalance -c 127.0.0.1:8091 -u ${globals.user} -p $(cat /root/couch_pass) --server-remove=${this.address}"
+        ]
+      }
+    },
+    "set-node-password": {
+      "cmd[${this.id}]": {
+        "user": "root",
+        "commands": [
+          "/opt/couchbase/bin/password_reset $(cat /root/couch_pass)"
         ]
       }
     },
