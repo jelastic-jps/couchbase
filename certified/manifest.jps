@@ -20,20 +20,24 @@
                   "envName":"${env.envName}",
                   "onInstall":[
                      {
+                        "forEach(clnode:nodes.nosqldb)":{
+                           "cleanup-node":{
+                              "id":"${@clnode.id}"
+                           }
+                        }
+                     },
+                     {
                         "cmd":{
                            "nodeId":"${settings.masterId}",
                            "user":"root",
                            "commands":[
-                              "node_cleanup; cluster_init"
+                              "cluster_init"
                            ]
                         }
                      },
                      {
                         "forEach(clnode:nodes.nosqldb)":{
                            "if (${@clnode.id} != ${settings.masterId})":{
-                              "cleanup-node":{
-                                 "id":"${@clnode.id}"
-                              },
                               "add-node":{
                                  "id":"${settings.masterId}",
                                  "address":"${@clnode.address}"
