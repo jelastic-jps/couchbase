@@ -7,9 +7,6 @@
       "user":"admin"
    },
    "baseUrl":"https://raw.githubusercontent.com/jelastic-jps/couchbase/master/certified",
-   "nodeGroupAlias": {
-      "${targetNodes.nodeGroup}": "nosqldb"
-   },
    "onInstall":{
       "forEach(nodes.nosqldb)":{
          "if (${@i.ismaster})":{
@@ -21,9 +18,6 @@
                   "type":"update",
                   "name":"auto-cluster",
                   "envName":"${env.envName}",
-                  "nodeGroupAlias": {
-                     "${targetNodes.nodeGroup}": "nosqldb"
-                  },
                   "onInstall":[
                      {
                         "forEach(clnode:nodes.nosqldb)":{
@@ -144,8 +138,7 @@
       {
          "install":{
             "jps":"${baseUrl}/manifest.jps?_r=${fn.random}",
-            "envName":"${event.response.env.envName}",
-            "nodeGroup": "nosqldb"
+            "envName":"${event.response.env.envName}"
          }
       }
    ]
