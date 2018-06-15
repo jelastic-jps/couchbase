@@ -66,20 +66,24 @@
                         }
                      }
                   ],
-                  "onAfterScaleOut[nosqldb]":[
-                     {
-                        "forEach(clnode:event.response.nodes)":{
-                           "add-node":{
-                              "id":"${settings.masterId}",
-                              "address":"${@clnode.address}"
-                           }
+                  "onAfterScaleOut[nosqldb]": [
+                    {
+                      "if (nodes.nosqldb.length > 1)": [
+                        {
+                          "forEach(clnode:event.response.nodes)": {
+                            "add-node": {
+                              "id": "${settings.masterId}",
+                              "address": "${@clnode.address}"
+                            }
+                          }
+                        },
+                        {
+                          "rebalance": {
+                            "id": "${settings.masterId}"
+                          }
                         }
-                     },
-                     {
-                        "rebalance":{
-                           "id":"${settings.masterId}"
-                        }
-                     }
+                      ]
+                    }
                   ],
                   "onBeforeScaleIn[nosqldb]":[
                      {
