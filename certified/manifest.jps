@@ -109,7 +109,7 @@
                 "cmd[${this.id}]": {
                   "user": "root",
                   "commands": [
-                    "couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts;"
+                    "retries=30; while [ $retries -gt 0 ]; do couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts; [ \"$?\" == 0 ] && break; let retries=${retries}-1; sleep 3; done;"
                   ]
                 }
               },
