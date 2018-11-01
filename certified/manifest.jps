@@ -4,7 +4,8 @@
   "id": "couchbase-auto-cluster",
   "name": "Auto Scalable Couchbase Cluster",
   "globals": {
-    "user": "admin"
+    "user": "admin",
+    "pswd": "${fn.password}"
   },
   "baseUrl": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/certified",
   "nodeGroupAlias": {
@@ -19,7 +20,7 @@
           },
           "jps": {
             "type": "update",
-            "name": "auto-cluster",
+            "name": "Couchbase Auto Scalable Cluster",
             "envName": "${env.envName}",
             "nodeGroupAlias": {
               "${targetNodes.nodeGroup}": "nosqldb"
@@ -67,6 +68,21 @@
                   "commands": [
                     "migrate_data"
                   ]
+                }
+              },
+              {
+                "if (!'${:}' && '${fn.compareEngine(1.6):}' > 0)": {
+                  "cmd": {
+                    "nodeId": "${settings.masterId}",
+                    "user": "root",
+                    "commands": [
+                      "jem passwd set -p ${globals.pswd}"
+                    ]
+                  },
+                  "return": {
+                    "result": "success",
+                    "email": "Use the data below for admin access:\n * Web Console: ${nodes.nosqldb.first.adminUrl}\n * User: ${globals.user}\n * Password: ${globals.pswd}"
+                  }
                 }
               }
             ],
@@ -141,7 +157,8 @@
           }
         }
       }
-    }
+    },
+    "success": "success"
   },
   "onAfterClone": [
     {
