@@ -1,80 +1,35 @@
 {
-    "jpsType": "update",
-    "jpsVersion": "0.99",
-    "id": "couchbase-auto-cluster",
-    "logo": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png",
-    "description": {
-        "text": "<span>Out-of-box Couchbase Cluster with preconfigured auto scaling and load rebalancing upon node count change.</span><div>The default Data RAM sizing for each server equals 1024 MiB, with Index RAM = 256 MiB and Full Text Search (FTS) RAM = 256 MiB.</div>",
-        "short": "Out-of-box Couchbase Cluster with preconfigured auto scaling and load balancing"
-    },
-    "name": "Auto Scalable Couchbase Cluster",
-    "globals": {
-        "user": "admin",
-        "pswd": "${fn.password}",
-        "data-ram": 1024,
-        "index-ram": 256,
-        "fts-ram": 256
-    },
-    "onInstall": [{
-            "cmd[${nodes.nosqldb.first.id}]": [
-                "couchbase-cli cluster-init -c 127.0.0.1:8091 --cluster-username=${globals.user} --cluster-password=${globals.pswd} --cluster-ramsize=${globals.data-ram} --cluster-index-ramsize=${globals.index-ram} --cluster-fts-ramsize=${globals.fts-ram} --index-storage-setting=memopt --services=data,index,query,fts",
-                "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules"
-            ]
-        }, {
-            "forEach(env.nodes)": {
-                "if (${@i.id} != ${nodes.nosqldb.first.id})": {
-                    "add-node": {
-                        "id": "${@i.id}",
-                        "address": "${@i.address}"
-                    }
-                }
-            }
-        },
-        "rebalance",
-        "autoscaling"
-    ],
-    "onAfterScaleOut[nosqldb]": [{
-            "forEach(event.response.nodes)": {
-                "add-node": {
-                    "id": "${@i.id}",
-                    "address": "${@i.address}"
-                }
-            }
-        },
-        "rebalance"
-    ],
-    "onBeforeScaleIn[nosqldb]": [{
-            "forEach(event.response.nodes)": {
-                "remove-node": {
-                    "address": "${@i.address}"
-                }
-            }
-        },
-        "rebalance"
-    ],
-    "actions": {
-        "add-node": {
-            "cmd[${this.id}]": [
-                "couchbase-cli server-add -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=${globals.pswd} --services=data,index,query,fts",
-                "iptables -t nat -I PREROUTING -p tcp -m tcp --dport 80 -j REDIRECT --to-ports 8091 && iptables-save > /etc/iptables.rules"
-            ]
-        },
-        "remove-node": {
-            "cmd[${nodes.nosqldb.first.id}]": "couchbase-cli rebalance -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p ${globals.pswd} --server-remove=${this.address}"
-        },
-        "rebalance": {
-            "cmd[${nodes.nosqldb.first.id}]": "couchbase-cli rebalance -c ${nodes.nosqldb.first.address}:8091 -u ${globals.user} -p ${globals.pswd}"
-        },
-        "autoscaling": {
-            "script": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js",
-            "params": {
-                "nodeGroup": "nosqldb",
-                "upLimit": "10",
-                "downLimit": "${nodes.nosqldb.length}"
-            }
-        }
-    },
-    "success": {
-        "email": "Use the data below for admin access:<br/>Web Console: <a href='${nodes.nosqldb.first.url}/ui/index.html' target='_blank'>${nodes.nosqldb.first.url}</a><br/>User: ${globals.user}<br/>Password: ${globals.pswd}"
+  "jpsType": "install",
+  "jpsVersion": "0.99",
+  "id": "couchbase-cluster",
+  "categories": [
+    "apps/clusters"
+  ],
+  "logo": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png",
+  "description": {
+    "text": "<span>Out-of-box Couchbase Community Edition Cluster with preconfigured auto scaling and load rebalancing upon node count change.</span><div>The default Data RAM sizing for each server equals 1024 MiB, with Index RAM = 256 MiB and Full Text Search (FTS) RAM = 256 MiB.</div>",
+    "short": "Out-of-box Couchbase Community Edition Cluster with preconfigured auto scaling and load balancing"
+  },
+  "name": "Auto Scalable Couchbase Community Edition Cluster",
+  "settings": {
+    "fields": [
+      {
+        "type": "spinner",
+        "name": "nodes",
+        "caption": "Nodes in Cluster",
+        "min": 1,
+        "max": 10,
+        "default": 3
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "nodeType": "couchbase",
+      "cloudlets": 16,
+      "nodeGroup": "cp",
+      "count": "${settings.nodes}"
     }
+  ],
+  "ssl": true
 }
