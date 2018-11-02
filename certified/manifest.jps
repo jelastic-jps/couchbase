@@ -2,7 +2,7 @@
   "jpsType": "update",
   "jpsVersion": "0.99",
   "id": "couchbase-auto-cluster",
-  "name": "Auto Scalable Couchbase Cluster",
+  "name": "Auto Scalable Couchbase Community Edition Cluster",
   "globals": {
     "user": "admin",
     "pswd": "${fn.password}"
@@ -20,7 +20,7 @@
           },
           "jps": {
             "type": "update",
-            "name": "Couchbase Auto Scalable Cluster",
+            "name": "Couchbase Community Edition Auto Scalable Cluster",
             "envName": "${env.envName}",
             "nodeGroupAlias": {
               "${targetNodes.nodeGroup}": "nosqldb"
