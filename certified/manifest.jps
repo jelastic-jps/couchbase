@@ -13,6 +13,13 @@
   },
   "onInstall": [
     {
+      "forEach(clnode:nodes.nosqldb)": {
+        "cleanup-node": {
+          "id": "${@clnode.id}"
+        }
+      }
+    },
+    {
       "cmd": {
         "nodeId": "${nodes.nosqldb.master.id}",
         "user": "root",
