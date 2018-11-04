@@ -11,155 +11,94 @@
   "nodeGroupAlias": {
     "${targetNodes.nodeGroup}": "nosqldb"
   },
-  "onInstall": {
-    "forEach(nodes.nosqldb)": {
-      "if (${@i.ismaster})": {
-        "install": {
-          "settings": {
-            "masterId": "${@i.id}"
-          },
-          "jps": {
-            "type": "update",
-            "name": "Couchbase Community Edition Auto Scalable Cluster",
-            "envName": "${env.envName}",
-            "nodeGroupAlias": {
-              "${targetNodes.nodeGroup}": "nosqldb"
-            },
-            "onInstall": [
-              {
-                "forEach(clnode:nodes.nosqldb)": {
-                  "cleanup-node": {
-                    "id": "${@clnode.id}"
-                  }
-                }
-              },
-              {
-                "cmd": {
-                  "nodeId": "${settings.masterId}",
-                  "user": "root",
-                  "commands": [
-                    "cluster_init"
-                  ]
-                }
-              },
-              {
-                "forEach(clnode:nodes.nosqldb)": {
-                  "if (${@clnode.id} != ${settings.masterId})": {
-                    "add-node": {
-                      "id": "${settings.masterId}",
-                      "address": "${@clnode.address}"
-                    }
-                  }
-                }
-              },
-              {
-                "if (nodes.nosqldb.length > 1)": [
-                  {
-                    "rebalance": {
-                      "id": "${settings.masterId}"
-                    }
-                  }
-                ]
-              },
-              {
-                "cmd": {
-                  "nodeId": "${settings.masterId}",
-                  "user": "root",
-                  "commands": [
-                    "migrate_data"
-                  ]
-                }
-              },
-              {
-                "if (!'${:}' && '${fn.compareEngine(1.6):}' > 0)": {
-                  "cmd": {
-                    "nodeId": "${settings.masterId}",
-                    "user": "root",
-                    "commands": [
-                      "jem passwd set -p ${globals.pswd}"
-                    ]
-                  },
-                  "return": {
-                    "result": "success",
-                    "email": "Use the data below for admin access:\n * Web Console: ${nodes.nosqldb.first.adminUrl}\n * User: ${globals.user}\n * Password: ${globals.pswd}"
-                  }
-                }
-              }
-            ],
-            "onAfterScaleOut[nosqldb]": [
-              {
-                "if (nodes.nosqldb.length > 1)": [
-                  {
-                    "forEach(clnode:event.response.nodes)": {
-                      "add-node": {
-                        "id": "${settings.masterId}",
-                        "address": "${@clnode.address}"
-                      }
-                    }
-                  },
-                  {
-                    "rebalance": {
-                      "id": "${settings.masterId}"
-                    }
-                  }
-                ]
-              }
-            ],
-            "onBeforeScaleIn[nosqldb]": [
-              {
-                "forEach(clnode:event.response.nodes)": {
-                  "remove-node": {
-                    "id": "${settings.masterId}",
-                    "address": "${@clnode.address}"
-                  }
-                }
-              },
-              {
-                "rebalance": {
-                  "id": "${settings.masterId}"
-                }
-              }
-            ],
-            "actions": {
-              "add-node": {
-                "cmd[${this.id}]": {
-                  "user": "root",
-                  "commands": [
-                    "retries=30; while [ $retries -gt 0 ]; do couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts &>/dev/null; [ \"$?\" == 0 ] && break; let retries=${retries}-1; sleep 4; done;"
-                  ]
-                }
-              },
-              "remove-node": {
-                "cmd[${this.id}]": {
-                  "user": "root",
-                  "commands": [
-                    "couchbase-cli rebalance -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-remove=${this.address}"
-                  ]
-                }
-              },
-              "rebalance": {
-                "cmd[${this.id}]": {
-                  "user": "root",
-                  "commands": [
-                    "rebalance_cluster"
-                  ]
-                }
-              },
-              "cleanup-node": {
-                "cmd[${this.id}]": {
-                  "user": "root",
-                  "commands": [
-                    "node_cleanup"
-                  ]
-                }
-              }
-            }
+  "onInstall": [
+    {
+      "cmd": {
+        "nodeId": "${nodes.nosqldb.master.id}",
+        "user": "root",
+        "commands": [
+          "cluster_init"
+        ]
+      }
+    },
+    {
+      "forEach(clnode:nodes.nosqldb)": {
+        "if (${@clnode.id} != ${nodes.nosqldb.master.id})": {
+          "add-node": {
+            "id": "${nodes.nosqldb.master.id}",
+            "address": "${@clnode.address}"
           }
         }
       }
     },
-    "success": "success"
-  },
+    {
+      "if (nodes.nosqldb.length > 1)": [
+        {
+          "rebalance": {
+            "id": "${nodes.nosqldb.master.id}"
+          }
+        }
+      ]
+    },
+    {
+      "cmd": {
+        "nodeId": "${nodes.nosqldb.master.id}",
+        "user": "root",
+        "commands": [
+          "migrate_data"
+        ]
+      }
+    },
+    {
+      "if (!'${:}' && '${fn.compareEngine(1.6):}' > 0)": {
+        "cmd": {
+          "nodeId": "${nodes.nosqldb.master.id}",
+          "user": "root",
+          "commands": [
+            "jem passwd set -p ${globals.pswd}"
+          ]
+        },
+        "return": {
+          "result": "success",
+          "email": "Use the data below for admin access:\n * Web Console: ${nodes.nosqldb.first.adminUrl}\n * User: ${globals.user}\n * Password: ${globals.pswd}"
+        }
+      }
+    }
+  ],
+  "onAfterScaleOut[nosqldb]": [
+    {
+      "if (nodes.nosqldb.length > 1)": [
+        {
+          "forEach(clnode:event.response.nodes)": {
+            "add-node": {
+              "id": "${nodes.nosqldb.master.id}",
+              "address": "${@clnode.address}"
+            }
+          }
+        },
+        {
+          "rebalance": {
+            "id": "${nodes.nosqldb.master.id}"
+          }
+        }
+      ]
+    }
+  ],
+  "onBeforeScaleIn[nosqldb]": [
+    {
+      "forEach(clnode:event.response.nodes)": {
+        "remove-node": {
+          "id": "${nodes.nosqldb.master.id}",
+          "address": "${@clnode.address}"
+        }
+      }
+    },
+    {
+      "rebalance": {
+        "id": "${nodes.nosqldb.master.id}"
+      }
+    }
+  ],
   "onAfterClone": [
     {
       "api": "environment.control.SendEnvCreatedEmail",
@@ -173,5 +112,40 @@
         "nodeGroup": "nosqldb"
       }
     }
-  ]
+  ],
+  "actions": {
+    "add-node": {
+      "cmd[${this.id}]": {
+        "user": "root",
+        "commands": [
+          "retries=30; while [ $retries -gt 0 ]; do couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts &>/dev/null; [ \"$?\" == 0 ] && break; let retries=${retries}-1; sleep 4; done;"
+        ]
+      }
+    },
+    "remove-node": {
+      "cmd[${this.id}]": {
+        "user": "root",
+        "commands": [
+          "couchbase-cli rebalance -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-remove=${this.address}"
+        ]
+      }
+    },
+    "rebalance": {
+      "cmd[${this.id}]": {
+        "user": "root",
+        "commands": [
+          "rebalance_cluster"
+        ]
+      }
+    },
+    "cleanup-node": {
+      "cmd[${this.id}]": {
+        "user": "root",
+        "commands": [
+          "node_cleanup"
+        ]
+      }
+    },
+    "success": "success"
+  }
 }
