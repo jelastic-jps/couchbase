@@ -1,6 +1,6 @@
 {
   "jpsType": "install",
-  "jpsVersion": "0.99",
+  "jpsVersion": "1.5",
   "id": "couchbase-cluster",
   "categories": [
     "apps/clusters"
