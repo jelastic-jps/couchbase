@@ -1,44 +1,34 @@
-{
-  "jpsType": "install",
-  "jpsVersion": "1.5",
-  "id": "couchbase-cluster",
-  "categories": [
-    "apps/clusters"
-  ],
-  "logo": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png",
-  "description": {
-    "text": "<span>Out-of-box Couchbase Community Edition Cluster with preconfigured auto scaling and load rebalancing upon node count change.</span><div>The default Data RAM sizing for each server equals 1024 MiB, with Index RAM = 256 MiB and Full Text Search (FTS) RAM = 256 MiB.</div>",
-    "short": "Out-of-box Couchbase Community Edition Cluster with preconfigured auto scaling and load balancing"
-  },
-  "name": "Auto Scalable Couchbase Community Edition Cluster",
-  "settings": {
-    "fields": [
-      {
-        "type": "spinner",
-        "name": "nodes",
-        "caption": "Nodes in Cluster",
-        "min": 1,
-        "max": 10,
-        "default": 3
-      }
-    ]
-  },
-  "nodes": [
-    {
-      "nodeType": "couchbase",
-      "cloudlets": 16,
-      "nodeGroup": "nosqldb",
-      "count": "${settings.nodes}"
-    }
-  ],
-  "actions": {
-    "autoscaling": {
-      "script": "https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js",
-      "params": {
-        "nodeGroup": "nosqldb",
-        "upLimit": "10",
-        "downLimit": "${settings.nodes}"
-      }
-    }
-  }
-}
+jpsType: install
+jpsVersion: '1.5'
+id: couchbase-cluster
+categories:
+  - apps/clusters
+logo: https://raw.githubusercontent.com/jelastic-jps/couchbase/master/images/couchbase-logo.png
+description:
+  text: "<span>Out-of-box Couchbase Community Edition Cluster with preconfigured auto
+    scaling and load rebalancing upon node count change.</span><div>The default Data
+    RAM sizing for each server equals 1024 MiB, with Index RAM = 256 MiB and Full
+    Text Search (FTS) RAM = 256 MiB.</div>"
+  short: Out-of-box Couchbase Community Edition Cluster with preconfigured auto scaling
+    and load balancing
+name: Auto-Scalable Couchbase CE Cluster
+settings:
+  fields:
+  - type: spinner
+    name: nodes
+    caption: Nodes in Cluster
+    min: 1
+    max: 10
+    default: 3
+nodes:
+- nodeType: couchbase
+  cloudlets: 16
+  nodeGroup: nosqldb
+  count: "${settings.nodes}"
+actions:
+  autoscaling:
+    script: https://raw.githubusercontent.com/jelastic-jps/couchbase/master/scripts/autoscaling-triggers.js
+    params:
+      nodeGroup: nosqldb
+      upLimit: '10'
+      downLimit: "${settings.nodes}"
