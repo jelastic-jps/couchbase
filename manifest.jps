@@ -12,14 +12,17 @@ description:
   short: Out-of-box Couchbase Community Edition Cluster with preconfigured auto scaling
     and load balancing
 name: Auto-Scalable Couchbase CE Cluster
-settings:
-  fields:
-  - type: spinner
-    name: nodes
-    caption: Nodes in Cluster
-    min: 1
-    max: 10
-    default: 3
+onBeforeInit: | 
+  var max = 10, markup = null, q = jelastic.billing.account.GetQuotas("environment.maxnodescount;environment.maxsamenodescount").array;
+  for (var i = 0; i < q.length; i++){
+      if (max > q[i].value) {
+        max = q[i].value; markup = "Quota limits: " + q[i].quota.name + " = " + max + ". Please upgrade your account.";
+      }
+  }
+  var resp = {result: 0, settings: {fields: [{type: "spinner", name: "nodes", caption: "Nodes in Cluster", min: 1, max: max, "default": Math.min(3, max)}]}};
+  if (markup) resp.settings.fields.push({"type": "displayfield", "cls": "warning", "height": 30, "hideLabel": true, "markup": markup}); 
+  return resp;
+
 nodes:
 - nodeType: couchbase
   cloudlets: 16
