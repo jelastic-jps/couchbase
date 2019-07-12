@@ -1,4 +1,4 @@
 Use the data below for admin access:  
-**Web Console:** [${env.protocol}://${env.domain}/ui/index.html](${env.protocol}://${env.domain}/ui/index.html)  
+**Web Console:** [${nodes.nosqldb.first.adminUrl}](${nodes.nosqldb.first.adminUrl})  
 **User:** ${globals.user}  
 **Password**: ${globals.pswd}  
