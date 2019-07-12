@@ -67,7 +67,7 @@
         },
         "return": {
           "result": "success",
-          "email": "Use the data below for admin access:\n * Web Console: ${nodes.nosqldb.first.adminUrl}\n * User: ${globals.user}\n * Password: ${globals.pswd}"
+          "email": "/../text/success.md"
         }
       }
     }
