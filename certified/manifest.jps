@@ -35,8 +35,9 @@ onAfterScaleOut[nosqldb]:
 
 onBeforeScaleIn[nosqldb]: 
   - forEach(clnode:event.response.nodes):
-    - remove-node: 
-        address: ${@clnode.address}
+    - if (${@clnode.id} != ${nodes.nosqldb.master.id}):
+      - remove-node: 
+          address: ${@clnode.address}
   - rebalance
 
 onAfterClone: 
