@@ -2,6 +2,7 @@ type: update
 version: 1.6.1
 id: couchbase-auto-cluster
 name: Auto Scalable Couchbase Community Edition Cluster
+targetNodes: none
 
 globals:
   user: admin
@@ -10,7 +11,7 @@ globals:
 baseUrl: https://raw.githubusercontent.com/jelastic-jps/couchbase/master/certified
 
 nodeGroupAlias: 
-  ${targetNodes.nodeGroup}: nosqldb
+  ${settings.nodeGroup}: nosqldb
 
 onInstall:
   - cmd[nosqldb]: node_cleanup
