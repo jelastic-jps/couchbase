@@ -27,7 +27,9 @@ onInstall:
     user: root
   
 onAfterScaleOut[nosqldb]: 
-  - if (nodes.nosqldb.length > 1): 
+  - if (nodes.nosqldb.length > 1):
+    - cmd [${event.response.nodes.join(id,)}]: node_cleanup
+      user: root 
     - forEach(clnode:event.response.nodes):
       - add-node: 
           address: ${@clnode.address}
