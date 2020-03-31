@@ -52,10 +52,7 @@ onAfterClone:
       envName: "${event.response.env.envName}"
       nodeGroup: nosqldb
       
-onAfterAttachExtIp:
-  - restart-nodes
-
-onAfterDetachExtIp:
+onAfterSetExtIpCount:
   - restart-nodes
 
 actions:
