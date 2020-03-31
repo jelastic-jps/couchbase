@@ -64,6 +64,10 @@ actions:
   rebalance: 
     - cmd[${nodes.nosqldb.master.id}]: rebalance_cluster
       user: root
+      
+  restart-nodes: 
+    - forEach(clnode:nodes.nosqldb):
+      - cmd[${@clnode.id}]: jem service restart
   
 success:
   email: /../text/success.md
