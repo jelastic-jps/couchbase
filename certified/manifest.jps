@@ -50,7 +50,13 @@ onAfterClone:
   - install:
       jps: "${baseUrl}/manifest.jps?_r=${fn.random}"
       envName: "${event.response.env.envName}"
-      nodeGroup: nosqldb 
+      nodeGroup: nosqldb
+      
+onAfterAttachExtIp:
+  - restart-nodes
+
+onAfterDetachExtIp:
+  - restart-nodes
 
 actions:
   add-node: 
