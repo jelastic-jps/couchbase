@@ -47,10 +47,11 @@ onAfterClone:
   - api: environment.control.SendEnvCreatedEmail
     appid: "${event.response.env.appid}"
     isImport: true
-  - install:
-      jps: "${baseUrl}/manifest.jps?_r=${fn.random}"
-      envName: "${event.response.env.envName}"
-      nodeGroup: nosqldb
+  - script: delete MANIFEST.id; return {result:0, jps:MANIFEST};
+  - install: ${response.jps}
+    envName: ${event.response.env.envName}
+    settings:
+      nodeGroup: ${settings.nodeGroup} 
       
 onAfterSetExtIpCount:
   - restart-nodes
