@@ -12,7 +12,7 @@ Docker containers, it’s built on top of the official [*couchbase*](https://hub
 you get 3 interconnected Couchbase containers (though their number could be adjusted beforehand, during the package
 installation stage). 
 
-![couchbase-server-cluster](images/couchbase-server-cluster.png)
+![couchbase-server-cluster](images/couchbase-server-cluster-new.svg)
 
 Upon creation, each Couchbase container is assigned *16 dynamic cloudlets* as a room of resources for [vertical scaling](https://docs.jelastic.com/automatic-vertical-scaling) (up to 2
 GiB of RAM and 6.4 GHz of CPU). Subsequently, this default limit could be adjusted through the environment topology wizard by
