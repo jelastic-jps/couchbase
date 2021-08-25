@@ -14,7 +14,7 @@ nodeGroupAlias:
   ${settings.nodeGroup}: nosqldb
 
 onInstall:
-  - cmd[${nodes.nosqldb.master.id}]: node_cleanup
+  - cmd[nosqldb]: node_cleanup
     user: root
   - cmd[${nodes.nosqldb.master.id}]: cluster_init
     user: root
