@@ -22,6 +22,7 @@ onInstall:
     - if (${@clnode.id} != ${nodes.nosqldb.master.id}): 
       - add-node: 
           address: ${@clnode.address}
+          newMemberId: ${@clnode.id}
   - if (nodes.nosqldb.length > 1): 
     - rebalance
   - cmd[${nodes.nosqldb.master.id}]: migrate_data; jem passwd set -p ${globals.pswd}
@@ -58,6 +59,7 @@ onAfterSetExtIpCount:
 
 actions:
   add-node: 
+    - cmd[${this.newMemberId}]: service couchbase restart
     - cmd[${nodes.nosqldb.master.id}]: retries=30; while [ $retries -gt 0 ]; do couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts &>/dev/null; [ \"$?\" == 0 ] && break; let retries=${retries}-1; sleep 4; done;
       user: root
 
