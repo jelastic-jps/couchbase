@@ -14,8 +14,11 @@ nodeGroupAlias:
   ${settings.nodeGroup}: nosqldb
 
 onInstall:
-  - cmd[nosqldb]: node_cleanup
-    user: root
+  - if (settings.cloned == 'true'):
+    - cmd[nosqldb]: node_cleanup
+      user: root
+    - forEach(clnode:nodes.nosqldb):
+      - cmd[${@clnode.id}]: sudo service couchbase restart
   - cmd[${nodes.nosqldb.master.id}]: cluster_init
     user: root
   - forEach(clnode:nodes.nosqldb):
@@ -30,8 +33,6 @@ onInstall:
   
 onAfterScaleOut[nosqldb]: 
   - if (nodes.nosqldb.length > 1):
-    - cmd [${event.response.nodes.join(id,)}]: node_cleanup
-      user: root 
     - forEach(clnode:event.response.nodes):
       - add-node: 
           address: ${@clnode.address}
@@ -53,14 +54,13 @@ onAfterClone:
     envName: ${event.response.env.envName}
     settings:
       nodeGroup: ${settings.nodeGroup} 
+      cloned: 'true'
       
 onAfterSetExtIpCount:
   - restart-nodes
 
 actions:
   add-node: 
-    - cmd[${this.newMemberId}]: service couchbase restart
-      user: root
     - cmd[${nodes.nosqldb.master.id}]: retries=30; while [ $retries -gt 0 ]; do couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts &>/dev/null; [ \"$?\" == 0 ] && break; let retries=${retries}-1; sleep 4; done;
       user: root
 
