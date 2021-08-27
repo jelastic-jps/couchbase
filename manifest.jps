@@ -26,7 +26,6 @@ onBeforeInit: |
 nodes:
 - nodeType: couchbase
   cloudlets: 16
-  fixedCloudlets: 12
   nodeGroup: nosqldb
   count: "${settings.nodes}"
 actions:
