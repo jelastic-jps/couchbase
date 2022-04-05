@@ -36,6 +36,7 @@ onAfterScaleOut[nosqldb]:
     - forEach(clnode:event.response.nodes):
       - add-node: 
           address: ${@clnode.address}
+          newMemberId: ${@clnode.id}
     - rebalance
 
 onBeforeScaleIn[nosqldb]: 
