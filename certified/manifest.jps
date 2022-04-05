@@ -60,7 +60,8 @@ onAfterSetExtIpCount:
   - restart-nodes
 
 actions:
-  add-node: 
+  add-node:
+    - cmd[${this.newMemberId}]: jem service restart
     - cmd[${nodes.nosqldb.master.id}]: retries=30; while [ $retries -gt 0 ]; do couchbase-cli server-add -c 127.0.0.1:8091 -u ${globals.user} -p $(couchpass) --server-add=${this.address}:8091 --server-add-username=${globals.user} --server-add-password=$(couchpass) --services=data,index,query,fts &>/dev/null; [ \"$?\" == 0 ] && break; let retries=${retries}-1; sleep 4; done;
       user: root
 
