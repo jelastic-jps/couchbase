@@ -59,6 +59,9 @@ onAfterClone:
       
 onAfterSetExtIpCount:
   - restart-nodes
+  
+onAfterStart:
+  - cmd[nosqldb]: jem service start
 
 actions:
   add-node:
